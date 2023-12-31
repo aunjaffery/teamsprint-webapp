@@ -2,6 +2,7 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Dashboard from "./pages/dashboard/Dashboard.page";
 import LoginPage from "./pages/AuthPages/Login.page";
 import NotFound from "./pages/notfound/NotFound.page";
+import MyBoards from "./pages/boards/MyBoards.page";
 import Layout from "./components/misc/Layout";
 import ProtectedRoute from "./services/ProtectedRoute";
 import useBoundStore from "./store/Store";
@@ -10,7 +11,7 @@ import Workspace from "./pages/ws/Workspace.page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Kaban from "./pages/kanban/Kaban";
+import Kanban from "./pages/kanban/Kanban.page";
 
 function App() {
   const navigate = useNavigate();
@@ -39,10 +40,18 @@ function App() {
             }
           />
           <Route
-            path="kanban"
+            path="boards"
             element={
               <ProtectedRoute isAllowed={!!authCheck}>
-                <Kaban />
+                <MyBoards />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="kanban/:id"
+            element={
+              <ProtectedRoute isAllowed={!!authCheck}>
+                <Kanban />
               </ProtectedRoute>
             }
           />

@@ -1,0 +1,103 @@
+import {
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Select,
+} from "@chakra-ui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import React from "react";
+import { toast } from "react-toastify";
+import Domain from "../../services/Endpoint";
+
+const CreateKbnModal = ({ isOpen, onClose, ws }) => {
+  const queryClient = useQueryClient();
+  const createBoard = useMutation({
+    mutationFn: async (e) => {
+      e.preventDefault();
+      const rsp = await axios.post(
+        `${Domain}/kbn/createKbn`,
+        new FormData(e.target),
+      );
+      return rsp.data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      queryClient.invalidateQueries({ queryKey: ["workspacekbns"] });
+      onClose();
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error("Error! Cannot create board");
+    },
+  });
+  const initialRef = React.useRef(null);
+
+  return (
+    <Box>
+      <Modal initialFocusRef={initialRef} isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Create Board</ModalHeader>
+          <ModalCloseButton />
+          <form onSubmit={createBoard.mutate}>
+            <ModalBody pb={6}>
+              <FormControl>
+                <FormLabel>Workspace</FormLabel>
+                <Select name="workspace" required>
+                  {ws &&
+                    ws.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.name}
+                      </option>
+                    ))}
+                </Select>
+              </FormControl>
+              <FormControl mt={4}>
+                <FormLabel>Title</FormLabel>
+                <Input
+                  ref={initialRef}
+                  placeholder="Board title"
+                  name="title"
+                  maxLength={50}
+                  required
+                />
+              </FormControl>
+
+              <FormControl mt={4}>
+                <FormLabel>Visibility</FormLabel>
+                <Select name="visibility" required>
+                  <option value="workspace">Workspace</option>
+                  <option value="board">Board</option>
+                  <option value="public">Public</option>
+                </Select>
+              </FormControl>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button
+                colorScheme="blue"
+                mr={3}
+                type="submit"
+                isLoading={createBoard.isPending}
+              >
+                Create
+              </Button>
+              <Button onClick={onClose}>Cancel</Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </Box>
+  );
+};
+export default CreateKbnModal;
