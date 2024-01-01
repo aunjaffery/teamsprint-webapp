@@ -6,7 +6,6 @@ import MyBoards from "./pages/boards/MyBoards.page";
 import Layout from "./components/misc/Layout";
 import ProtectedRoute from "./services/ProtectedRoute";
 import useBoundStore from "./store/Store";
-import { useEffect } from "react";
 import Workspace from "./pages/ws/Workspace.page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
@@ -14,16 +13,16 @@ import "react-toastify/dist/ReactToastify.css";
 import Kanban from "./pages/kanban/Kanban.page";
 
 function App() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const authCheck = useBoundStore((state) => {
     return state.user ? state.user : false;
   });
-  useEffect(() => {
-    // useEffect only if you want whole App private.
-    if (authCheck === false) navigate("login");
-    //remove this useEffect if You want some public pages in App.
-    //Route can handle private pages individually through ProtectedRoute
-  }, [authCheck]);
+  // useEffect(() => {
+  //   // useEffect only if you want whole App private.
+  //   if (authCheck === false) navigate("login");
+  //   //remove this useEffect if You want some public pages in App.
+  //   //Route can handle private pages individually through ProtectedRoute
+  // }, [authCheck]);
 
   const queryClient = new QueryClient();
   return (
@@ -47,14 +46,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="kanban/:id"
-            element={
-              <ProtectedRoute isAllowed={!!authCheck}>
-                <Kanban />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="kanban/:id" element={<Kanban />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

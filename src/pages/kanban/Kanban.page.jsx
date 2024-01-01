@@ -1,6 +1,5 @@
-import { Box, Button, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
-import { useParams } from "react-router-dom";
 import {
   DndContext,
   DragOverlay,
@@ -21,75 +20,142 @@ import { CSS } from "@dnd-kit/utilities";
 
 const Kanban = () => {
   const [activeId, setActiveId] = useState(null);
-  const [items, setItems] = useState([
-    { id: 1, index: 1, title: "Hello world" },
-    { id: 2, index: 2, title: "Everythin is awsome" },
-    { id: 3, index: 3, title: "Building the famous Application" },
+  const [boards, _] = useState([
+    { id: 101, title: "todo" },
+    { id: 102, title: "done" },
   ]);
-  let { id } = useParams();
-  console.log(id);
-  const handleDragStart = (e) => {
-    console.log(e);
-    setActiveId(e.active.id);
-  };
+  const [items, setItems] = useState([
+    { id: 1, status: "todo", title: "Hello world" },
+    { id: 2, status: "done", title: "Everything is Completed" },
+    { id: 3, status: "todo", title: "Building the famous Application" },
+  ]);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
   );
+
+  const handleDragStart = (e) => {
+    const { active } = e;
+    let act = {
+      id: active?.id,
+      type: active?.data?.current?.type,
+    };
+    console.log(act);
+    setActiveId(act);
+  };
   const handleDragMove = (e) => {
     const { active, over } = e;
-    if (!active.id || !over.id) {
-      return;
+    let actId = active?.id;
+    let actType = active?.data?.current?.type;
+    let ovrId = over?.id;
+    let ovrType = over?.data?.current?.type;
+    console.log(`act ${actId}-${actType} | ovr ${ovrId}-${ovrType}`);
+    if (!actType || !ovrType || !actId || !ovrId) return;
+    if (actId === ovrId && actType === ovrType) return;
+    if (actType === "item" && ovrType === "board") {
+      // all logic
     }
-    if (active.id === over.id) {
-      return;
-    }
-    if (active.id && over.id && active.id !== over.id) {
-      let activeItemIndex = items.findIndex((f) => f.id === active.id);
-      let overItemIndex = items.findIndex((f) => f.id === over.id);
-      console.log(activeItemIndex, overItemIndex);
-      let newItems = [...items];
-      newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
-      setItems(newItems);
-    }
+    // if (active.id && over.id && active.id !== over.id) {
+    //   let activeItemIndex = items.findIndex((f) => f.id === active.id);
+    //   let overItemIndex = items.findIndex((f) => f.id === over.id);
+    //   if (activeItemIndex < 0 || overItemIndex < 0) return;
+    //   let newItems = [...items];
+    //   newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
+    //   setItems(newItems);
+    // }
   };
   let dragEnd = (e) => {
     const { active, over } = e;
     setActiveId(null);
   };
-  const findItems = (id) => {
-    return items.find((i) => i.id === id);
+  const findItems = (id, type) => {
+    if (type === "item") {
+      let item = items.find((i) => i.id === id);
+      return item;
+    }
+    if (type === "board") {
+      let board = boards.find((i) => i.id === id);
+      return board;
+    }
   };
 
   return (
     <Box>
       <PageTitle title="Kanban" />
-      <Flex>
-        <Box bg="gray.200" p="8" borderRadius="lg">
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
-            onDragEnd={dragEnd}
-          >
-            <SortableContext items={items}>
-              <Flex direction="column" gridRowGap={4}>
-                {items.map((x) => (
-                  <Item key={x.id} id={x.id} item={x} />
-                ))}
-              </Flex>
-            </SortableContext>
-            <DragOverlay>
-              {activeId ? (
-                <Item id={activeId} item={findItems(activeId)} />
-              ) : null}
-            </DragOverlay>
-          </DndContext>
-        </Box>
+      <Flex gridColumnGap="12">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragMove={handleDragMove}
+          onDragEnd={dragEnd}
+        >
+          <SortableContext items={boards.map((i) => i.id)}>
+            {boards.map((b) => (
+              <Board key={b.id} id={b.id} item={b}>
+                <SortableContext
+                  items={items
+                    .filter((i) => i.status === b.title)
+                    .map((i) => i.id)}
+                >
+                  <Flex direction="column" gridRowGap={4}>
+                    {items.map((x) =>
+                      x.status === b.title ? (
+                        <Item key={x.id} id={x.id} item={x} />
+                      ) : null,
+                    )}
+                  </Flex>
+                </SortableContext>
+              </Board>
+            ))}
+          </SortableContext>
+          <DragOverlay></DragOverlay>
+        </DndContext>
       </Flex>
+    </Box>
+  );
+};
+const Board = ({ id, item, children }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transition,
+    transform,
+    isDragging,
+  } = useSortable({
+    id: id,
+    data: {
+      type: "board",
+    },
+  });
+  return (
+    <Box
+      ref={setNodeRef}
+      {...attributes}
+      style={{
+        transition,
+        transform: CSS.Translate.toString(transform),
+        opacity: isDragging ? "30%" : "100%",
+      }}
+    >
+      <Box
+        bg="gray.200"
+        pb="8"
+        px="4"
+        borderRadius="xl"
+        minW="280px"
+        {...listeners}
+      >
+        <Flex justifyContent="center" alignItems="center" py="4">
+          <Text fontWeight="bold" fontSize="md" userSelect="none">
+            {item.title}
+          </Text>
+        </Flex>
+        {children}
+      </Box>
     </Box>
   );
 };
