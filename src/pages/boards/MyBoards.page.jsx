@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Container } from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -19,8 +19,10 @@ const MyBoards = () => {
   const ws = data?.ws;
   return (
     <Box>
-      <PageTitle title="Your Workspaces" />
-      <Box>{isLoading ? <CustomLoader /> : <WsKbnList ws={ws} />}</Box>
+      <Container maxW="container.xl">
+        <PageTitle title="Your Workspaces" />
+        <Box>{isLoading ? <CustomLoader /> : <WsKbnList ws={ws} />}</Box>
+      </Container>
     </Box>
   );
 };

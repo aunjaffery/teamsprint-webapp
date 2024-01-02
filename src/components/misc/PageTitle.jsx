@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useColorModeValue } from "@chakra-ui/react";
 
 const PageTitle = ({ title = "Dashboard" }) => {
   return (
@@ -7,7 +7,7 @@ const PageTitle = ({ title = "Dashboard" }) => {
         fontSize="2xl"
         fontWeight="bold"
         textTransform="capitalize"
-        color="gray.600"
+        color={useColorModeValue("gray.600", "gray.400")}
       >
         {title}
       </Text>

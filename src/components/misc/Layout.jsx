@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useColorModeValue } from "@chakra-ui/react";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -21,7 +21,7 @@ const Layout = ({ children }) => {
         <Box
           flex="1"
           minH="calc(100vh)"
-          bg="bg.100"
+          bg={useColorModeValue("bg.100", "dark.100")}
           position="relative"
           overflowY="hidden"
         >

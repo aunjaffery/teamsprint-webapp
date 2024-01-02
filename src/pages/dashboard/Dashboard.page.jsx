@@ -1,19 +1,20 @@
-import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import { Box, Container, Flex, Image, Text, useColorModeValue } from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
 
 const Dashboard = () => {
   return (
     <Box>
+      <Container maxW="container.xl">
       <PageTitle title="Dasboard" />
       <Box>
         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => (
           <Box key={x} boxShadow="md">
-            <Box bg="blackAlpha.50" mb="10" p="6" borderRadius="lg">
+            <Box bg={useColorModeValue("blackAlpha.50", "dark.300")} mb="10" p="6" borderRadius="lg">
               <Text fontWeight="bold" fontSize="lg" mb="2">
                 Lorem ipsum dolor sit amet, qui minim labore adipisicing minim
                 sint cillum sint consectetur cupidatat.
               </Text>
-              <Text color="gray.600" fontSize="sm">
+              <Text color={useColorModeValue("gray.600", "gray.400")} fontSize="sm">
                 Lorem ipsum dolor sit amet, officia excepteur ex fugiat
                 reprehenderit enim labore culpa sint ad nisi Lorem pariatur
                 mollit ex esse exercitation amet. Nisi anim cupidatat excepteur
@@ -31,7 +32,8 @@ const Dashboard = () => {
           </Box>
         ))}
       </Box>
-    </Box>
+    </Container>
+		</Box>
   );
 };
 

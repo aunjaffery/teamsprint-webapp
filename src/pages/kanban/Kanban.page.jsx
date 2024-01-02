@@ -1,4 +1,12 @@
-import { Box, Container, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import {
+  Avatar,
+  Box,
+  Container,
+  Flex,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
 import {
   DndContext,
@@ -16,22 +24,15 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from "@dnd-kit/sortable";
-import { LuPlus } from "react-icons/lu";
+import { LuMessageSquare, LuPlus } from "react-icons/lu";
 
 import { CSS } from "@dnd-kit/utilities";
+import { fk_boards, fk_items } from "./faker";
 
 const Kanban = () => {
   const [activeId, setActiveId] = useState(null);
-  const [boards, _] = useState([
-    { id: 101, title: "todo" },
-    { id: 102, title: "done" },
-  ]);
-  const [items, setItems] = useState([
-    { id: 1, status: "todo", title: "Hello world" },
-    { id: 2, status: "done", title: "Everything is Completed" },
-    { id: 3, status: "todo", title: "Building the famous Application" },
-    { id: 4, status: "done", title: "Sleep" },
-  ]);
+  const [boards, _] = useState(fk_boards);
+  const [items, setItems] = useState(fk_items);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -107,7 +108,7 @@ const Kanban = () => {
     <Box>
       <Container maxW="container.xl">
         <PageTitle title="Kanban" />
-        <SimpleGrid columns={[1, 1, 2, 3, 4]} spacing="10">
+        <SimpleGrid columns={[1, 1, 2, 3, 3]} spacing="10">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCorners}
@@ -180,7 +181,7 @@ const Board = ({ id, title, children }) => {
     >
       <Flex
         w="full"
-        bg="footer.100"
+        bg={useColorModeValue("gray.200", "dark.200")}
         borderRadius="xl"
         direction="column"
         gridRowGap={4}
@@ -198,14 +199,14 @@ const Board = ({ id, title, children }) => {
         </Flex>
         {children}
         <Flex
-          color="gray.600"
+          color="gray.500"
           alignItems="center"
           justifyContent="center"
           gridColumnGap={2}
           py="1"
           borderRadius="md"
           _hover={{
-            bg: "gray.300",
+            bg: useColorModeValue("gray.300", "dark.100"),
           }}
         >
           <LuPlus size="18" />
@@ -239,21 +240,51 @@ const Item = ({ id, title }) => {
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? "30%" : "100%",
       }}
-      p="4"
-      boxShadow="lg"
-      borderRadius="lg"
-      bg="white"
-      borderColor="white"
-      borderWidth="1px"
-      _hover={{
-        borderWidth: "1px",
-        borderColor: "blue.400",
-      }}
       {...listeners}
     >
-      <Flex justifyContent="flex-start" alignItems="center">
-        <Text userSelect="none">{title}</Text>
-      </Flex>
+      <Box
+        p="4"
+        boxShadow="xl"
+        borderRadius="md"
+        bg={useColorModeValue("white", "dark.300")}
+        borderColor={useColorModeValue("white", "dark.300")}
+        borderWidth="1px"
+        _hover={{
+          borderWidth: "1px",
+          borderColor: "blue.400",
+        }}
+      >
+        {id % 2 === 0 && (
+          <Box w="32px" h="4px" bg="red.400" borderRadius="full" mb="2" />
+        )}
+        <Text
+          userSelect="none"
+          color={useColorModeValue("gray.700", "gray.300")}
+        >
+          {title}
+        </Text>
+        {id % 2 === 0 && (
+          <Flex
+            justifyContent="space-between"
+            alignItems="flex-end"
+            color="gray.400"
+            gridColumnGap={2}
+            mt="1"
+          >
+            <Flex alignItems="center">
+              <LuMessageSquare size="16" />
+              <Text fontSize="xs" ml="1">
+                3
+              </Text>
+            </Flex>
+            <Avatar
+              size="xs"
+              name="Dan Abrahmov"
+              src="https://bit.ly/prosper-baba"
+            />
+          </Flex>
+        )}
+      </Box>
     </Box>
   );
 };
