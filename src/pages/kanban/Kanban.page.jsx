@@ -1,4 +1,4 @@
-import { Box, Flex, SimpleGrid, Text } from "@chakra-ui/react";
+import { Box, Container, Flex, SimpleGrid, Text } from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
 import {
   DndContext,
@@ -16,6 +16,8 @@ import {
   sortableKeyboardCoordinates,
   useSortable,
 } from "@dnd-kit/sortable";
+import { LuPlus } from "react-icons/lu";
+
 import { CSS } from "@dnd-kit/utilities";
 
 const Kanban = () => {
@@ -52,17 +54,21 @@ const Kanban = () => {
     let actType = active?.data?.current?.type;
     let ovrId = over?.id;
     let ovrType = over?.data?.current?.type;
-    if (actType === "board" || ovrType === "board") return;
+    if (actType === "board" && ovrType === "board") return;
+    if (actType === "board" && ovrType === "item") return;
     console.log(`act ${actId}-${actType} | ovr ${ovrId}-${ovrType}`);
     if (!actType || !ovrType || !actId || !ovrId) return;
     if (actId === ovrId) return;
-    if (actType === "item" && ovrType === "board") {
-      // all logic
-    }
     let newItems = [...items];
     let activeItem = newItems.find((x) => x.id === actId);
     let overItem = newItems.find((x) => x.id === ovrId);
-    if (activeItem.status === overItem.status) {
+    if (actType === "item" && ovrType === "board") {
+      console.log("-- Corect logic --");
+      let ovrBoard = boards.find((b) => b.id === ovrId);
+      console.log(ovrBoard);
+      activeItem.status = ovrBoard.title;
+      setItems(newItems);
+    } else if (activeItem.status === overItem.status) {
       let activeItemIndex = items.findIndex((f) => f.id === active.id);
       let overItemIndex = items.findIndex((f) => f.id === over.id);
       if (activeItemIndex < 0 || overItemIndex < 0) return;
@@ -89,7 +95,6 @@ const Kanban = () => {
   const findItems = (id, type) => {
     if (type === "item") {
       let item = items.find((i) => i.id === id);
-      console.log(item);
       return item.title;
     }
     if (type === "board") {
@@ -100,50 +105,52 @@ const Kanban = () => {
 
   return (
     <Box>
-      <PageTitle title="Kanban" />
-      <SimpleGrid columns={[1, 1, 2, 3, 4]} spacing="10">
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragStart={handleDragStart}
-          onDragMove={handleDragMove}
-          onDragEnd={dragEnd}
-        >
-          <SortableContext items={boards.map((i) => i.id)}>
-            {boards.map((b) => (
-              <Board key={b.id} id={b.id} title={b.title}>
-                <SortableContext
-                  items={items
-                    .filter((x) => x.status === b.title)
-                    .map((i) => i.id)}
-                >
-                  <Flex direction="column" gridRowGap={4}>
-                    {items.map((x) =>
-                      x.status === b.title ? (
-                        <Item key={x.id} id={x.id} title={x.title} />
-                      ) : null,
-                    )}
-                  </Flex>
-                </SortableContext>
-              </Board>
-            ))}
-          </SortableContext>
-          <DragOverlay>
-            {activeId && activeId?.id && activeId?.type === "board" && (
-              <Board id={activeId.id} title={findItems(activeId.id, "board")}>
-                {items.map((x) =>
-                  x.status === findItems(activeId.id, "board") ? (
-                    <Item key={x.id} id={x.id} title={x.title} />
-                  ) : null,
-                )}
-              </Board>
-            )}
-            {activeId && activeId?.id && activeId?.type === "item" && (
-              <Item id={activeId.id} title={findItems(activeId.id, "item")} />
-            )}
-          </DragOverlay>
-        </DndContext>
-      </SimpleGrid>
+      <Container maxW="container.xl">
+        <PageTitle title="Kanban" />
+        <SimpleGrid columns={[1, 1, 2, 3, 4]} spacing="10">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragStart={handleDragStart}
+            onDragMove={handleDragMove}
+            onDragEnd={dragEnd}
+          >
+            <SortableContext items={boards.map((i) => i.id)}>
+              {boards.map((b) => (
+                <Board key={b.id} id={b.id} title={b.title}>
+                  <SortableContext
+                    items={items
+                      .filter((x) => x.status === b.title)
+                      .map((i) => i.id)}
+                  >
+                    <Flex direction="column" gridRowGap={4}>
+                      {items.map((x) =>
+                        x.status === b.title ? (
+                          <Item key={x.id} id={x.id} title={x.title} />
+                        ) : null,
+                      )}
+                    </Flex>
+                  </SortableContext>
+                </Board>
+              ))}
+            </SortableContext>
+            <DragOverlay>
+              {activeId && activeId?.id && activeId?.type === "board" && (
+                <Board id={activeId.id} title={findItems(activeId.id, "board")}>
+                  {items.map((x) =>
+                    x.status === findItems(activeId.id, "board") ? (
+                      <Item key={x.id} id={x.id} title={x.title} />
+                    ) : null,
+                  )}
+                </Board>
+              )}
+              {activeId && activeId?.id && activeId?.type === "item" && (
+                <Item id={activeId.id} title={findItems(activeId.id, "item")} />
+              )}
+            </DragOverlay>
+          </DndContext>
+        </SimpleGrid>
+      </Container>
     </Box>
   );
 };
@@ -162,7 +169,7 @@ const Board = ({ id, title, children }) => {
     },
   });
   return (
-    <Flex
+    <Box
       ref={setNodeRef}
       {...attributes}
       style={{
@@ -170,21 +177,42 @@ const Board = ({ id, title, children }) => {
         transform: CSS.Translate.toString(transform),
         opacity: isDragging ? "30%" : "100%",
       }}
-      w="full"
-      bg="gray.200"
-      pb="8"
-      px="4"
-      borderRadius="xl"
-      direction="column"
-      gridRowGap={4}
     >
-      <Flex justifyContent="center" alignItems="center" py="4" {...listeners}>
-        <Text fontWeight="bold" fontSize="md" userSelect="none">
-          {title}
-        </Text>
+      <Flex
+        w="full"
+        bg="footer.100"
+        borderRadius="xl"
+        direction="column"
+        gridRowGap={4}
+        p="4"
+      >
+        <Flex justifyContent="center" alignItems="center" {...listeners}>
+          <Text
+            fontWeight="bold"
+            fontSize="md"
+            userSelect="none"
+            textTransform="capitalize"
+          >
+            {title}
+          </Text>
+        </Flex>
+        {children}
+        <Flex
+          color="gray.600"
+          alignItems="center"
+          justifyContent="center"
+          gridColumnGap={2}
+          py="1"
+          borderRadius="md"
+          _hover={{
+            bg: "gray.300",
+          }}
+        >
+          <LuPlus size="18" />
+          <Text fontWeight="bold">Add a card</Text>
+        </Flex>
       </Flex>
-      {children}
-    </Flex>
+    </Box>
   );
 };
 

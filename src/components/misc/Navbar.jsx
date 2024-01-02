@@ -13,6 +13,7 @@ import {
 import useBoundStore from "../../store/Store";
 import { MdMenu, MdNotifications } from "react-icons/md";
 import { LuClipboardCheck, LuLayoutTemplate, LuUsers } from "react-icons/lu";
+import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
   const { isSidebarOpen, onSidebarClose, onSidebarOpen } = useBoundStore(
@@ -93,6 +94,7 @@ const Navbar = () => {
               </MenuList>
             </Menu>
           </Box>
+          <NavLink to="/kanban/123">kanban</NavLink>
         </Flex>
 
         <Flex justifyContent="center" alignItems="center" pr="2">

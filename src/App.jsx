@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Kanban from "./pages/kanban/Kanban.page";
+import Test from "./pages/test/Test";
 
 function App() {
   // const navigate = useNavigate();
@@ -47,6 +48,7 @@ function App() {
             }
           />
           <Route path="kanban/:id" element={<Kanban />} />
+          <Route path="test" element={<Test />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

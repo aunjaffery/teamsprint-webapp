@@ -17,6 +17,7 @@ const colors = {
   },
   bg: {
     100: "#f5f5f7",
+    200: "#f5f4f7",
   },
   footer: {
     100: "#e9cdb3",

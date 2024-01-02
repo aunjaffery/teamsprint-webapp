@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
-import { Box, Container, Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 
 const Layout = ({ children }) => {
   const location = useLocation();
@@ -42,7 +42,7 @@ const Layout = ({ children }) => {
             }}
           >
             <Navbar />
-            <Container maxW="container.xl">{children}</Container>
+            {children}
           </Box>
         </Box>
       </Flex>

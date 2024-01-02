@@ -2,7 +2,7 @@ import { Box, Text } from "@chakra-ui/react";
 
 const PageTitle = ({ title = "Dashboard" }) => {
   return (
-    <Box my="6">
+    <Box py="6">
       <Text
         fontSize="2xl"
         fontWeight="bold"
