@@ -2,9 +2,7 @@ import { useEffect } from "react";
 import useBoundStore from "../../store/Store";
 import jwtDecode from "jwt-decode";
 import { setSession, getAccessToken } from "../../services/jwt.service";
-import { SiFirefox } from "react-icons/si";
-import { Box, Flex, Spinner } from "@chakra-ui/react";
-import LogoAnimation from "../misc/LogoAnimation";
+import { Box, Flex, Spinner, useColorModeValue } from "@chakra-ui/react";
 
 const Auth = ({ children }) => {
   const { loginWithToken, tokenLoading, logoutService } = useBoundStore(
@@ -40,9 +38,9 @@ const Auth = ({ children }) => {
   return (
     <div>
       {tokenLoading ? (
-        <Box bg="bg.100" h="100vh">
+        <Box bg={useColorModeValue("bg.100", "dark.100")} h="100vh">
           <Flex justifyContent="center" alignItems="center" h="100%">
-            <LogoAnimation />
+            <Spinner size="xl" />
           </Flex>
         </Box>
       ) : (

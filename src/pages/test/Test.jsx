@@ -7,22 +7,17 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import {
-  DndContext,
-  DragOverlay,
-  useDraggable,
-  useDroppable,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, useDroppable } from "@dnd-kit/core";
 import { useState } from "react";
-import { fk_boards, fk_items } from "../kanban/faker";
 import { SortableContext, arrayMove, useSortable } from "@dnd-kit/sortable";
 import { LuMessageSquare, LuPlus } from "react-icons/lu";
+import { fk_items, fk_lists } from "../../components/kanban/faker";
 
 const Test = () => {
-  const [boards, setBoards] = useState(fk_boards);
+  const [boards, _] = useState(fk_lists);
   const [items, setItems] = useState(fk_items);
   const [activeId, setActiveId] = useState(null);
-  const priorityOrder = { critical: 0, high: 1, normal: 2, low: 3 };
+  // const priorityOrder = { critical: 0, high: 1, normal: 2, low: 3 };
 
   const dgstart = (e) => {
     // console.log(e);

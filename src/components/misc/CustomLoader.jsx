@@ -1,10 +1,9 @@
-import { Flex } from "@chakra-ui/react";
-import LogoAnimation from "./LogoAnimation";
+import { Flex, Spinner } from "@chakra-ui/react";
 
 const CustomLoader = ({ height = "600px" }) => {
   return (
     <Flex justifyContent="center" alignItems="center" h={height}>
-      <LogoAnimation size="60" />
+      <Spinner size="xl" />
     </Flex>
   );
 };

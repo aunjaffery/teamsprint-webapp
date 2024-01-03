@@ -10,8 +10,8 @@ import Workspace from "./pages/ws/Workspace.page";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Kanban from "./pages/kanban/Kanban.page";
 import Test from "./pages/test/Test";
+import KanbanPage from "./pages/kanban/Kanban.page";
 
 function App() {
   // const navigate = useNavigate();
@@ -47,7 +47,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="kanban/:id" element={<Kanban />} />
+          <Route path="kanban/:id" element={<KanbanPage />} />
           <Route path="test" element={<Test />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
