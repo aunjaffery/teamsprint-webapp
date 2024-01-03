@@ -6,195 +6,144 @@ import {
   SimpleGrid,
   Text,
   useColorModeValue,
+  useDisclosure,
 } from "@chakra-ui/react";
-import PageTitle from "../../components/misc/PageTitle";
-import {
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  PointerSensor,
-  closestCorners,
-  useSensor,
-  useSensors,
-} from "@dnd-kit/core";
+import { DndContext, DragOverlay, useDroppable } from "@dnd-kit/core";
 import { useState } from "react";
-import {
-  SortableContext,
-  arrayMove,
-  sortableKeyboardCoordinates,
-  useSortable,
-} from "@dnd-kit/sortable";
+import { fk_boards, fk_items } from "../kanban/faker";
+import { SortableContext, arrayMove, useSortable } from "@dnd-kit/sortable";
 import { LuMessageSquare, LuPlus } from "react-icons/lu";
-
-import { CSS } from "@dnd-kit/utilities";
-import { fk_boards, fk_items } from "./faker";
+import PageTitle from "../../components/misc/PageTitle";
+import CreateCardModal from "../../components/modals/CreateCard";
 
 const Kanban = () => {
-  const [activeId, setActiveId] = useState(null);
   const [boards, _] = useState(fk_boards);
   const [items, setItems] = useState(fk_items);
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+  const [activeId, setActiveId] = useState(null);
+  const [stage, setStage] = useState(null);
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const handleDragStart = (e) => {
-    const { active } = e;
-    let act = {
-      id: active?.id,
-      type: active?.data?.current?.type,
-    };
-    console.log(act);
-    setActiveId(act);
+  const dgstart = (e) => {
+    // console.log(e);
+    setActiveId(e?.active?.id);
   };
-  const handleDragMove = (e) => {
+  const dgover = (e) => {
     const { active, over } = e;
+    if (!active || !over) return;
     let actId = active?.id;
-    let actType = active?.data?.current?.type;
     let ovrId = over?.id;
+    let actType = active?.data?.current?.type;
     let ovrType = over?.data?.current?.type;
-    if (actType === "board" && ovrType === "board") return;
-    if (actType === "board" && ovrType === "item") return;
-    console.log(`act ${actId}-${actType} | ovr ${ovrId}-${ovrType}`);
-    if (!actType || !ovrType || !actId || !ovrId) return;
+    if (!actId || !ovrId || !actType || !ovrType) return;
     if (actId === ovrId) return;
-    let newItems = [...items];
-    let activeItem = newItems.find((x) => x.id === actId);
-    let overItem = newItems.find((x) => x.id === ovrId);
-    if (actType === "item" && ovrType === "board") {
-      console.log("-- Corect logic --");
-      let ovrBoard = boards.find((b) => b.id === ovrId);
-      console.log(ovrBoard);
-      activeItem.status = ovrBoard.title;
-      setItems(newItems);
-    } else if (activeItem.status === overItem.status) {
-      let activeItemIndex = items.findIndex((f) => f.id === active.id);
-      let overItemIndex = items.findIndex((f) => f.id === over.id);
-      if (activeItemIndex < 0 || overItemIndex < 0) return;
+    console.log(`act ${actId}-${actType} | ovr ${ovrId}-${ovrType}`);
+    if (actType === "card" && ovrType === "board") {
       let newItems = [...items];
-      newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
-      setItems(newItems);
-    } else {
-      activeItem.status = overItem.status;
+      let actItem = newItems.find((x) => x.id === actId);
+      let ovrItem = boards.find((x) => x.id === ovrId);
+      if (actItem.stage === ovrItem.title) return;
+      actItem.stage = ovrItem.title;
       setItems(newItems);
     }
-    // if (active.id && over.id && active.id !== over.id) {
-    //   let activeItemIndex = items.findIndex((f) => f.id === active.id);
-    //   let overItemIndex = items.findIndex((f) => f.id === over.id);
-    //   if (activeItemIndex < 0 || overItemIndex < 0) return;
-    //   let newItems = [...items];
-    //   newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
-    //   setItems(newItems);
-    // }
+    if (actType === "card" && ovrType === "card") {
+      let newItems = [...items];
+      let actItem = newItems.find((x) => x.id === actId);
+      let ovrItem = newItems.find((x) => x.id === ovrId);
+      if (actItem.stage === ovrItem.stage) {
+        let activeItemIndex = items.findIndex((f) => f.id === active.id);
+        let overItemIndex = items.findIndex((f) => f.id === over.id);
+        if (activeItemIndex < 0 || overItemIndex < 0) return;
+        let newItems = [...items];
+        newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
+        setItems(newItems);
+      } else {
+        actItem.stage = ovrItem.stage;
+        setItems(newItems);
+      }
+    }
   };
-  let dragEnd = (e) => {
-    const { active, over } = e;
+  const dgend = () => {
+    // console.log(e);
     setActiveId(null);
   };
-  const findItems = (id, type) => {
-    if (type === "item") {
-      let item = items.find((i) => i.id === id);
-      return item.title;
-    }
-    if (type === "board") {
-      let board = boards.find((i) => i.id === id);
-      return board.title;
-    }
+  const findItems = (id) => {
+    if (!id) return;
+    let i = items.find((x) => x.id === id);
+    return i;
+  };
+
+  const openCreateCard = (stage) => {
+    setStage(stage);
+    onOpen();
   };
 
   return (
-    <Box>
-      <Container maxW="container.xl">
-        <PageTitle title="Kanban" />
-        <SimpleGrid columns={[1, 1, 2, 3, 3]} spacing="10">
+    <Box bg="none" minH="100vh">
+      <Container maxW="1400px">
+        <PageTitle title="Kaban" />
+        <Box>
           <DndContext
-            sensors={sensors}
-            collisionDetection={closestCorners}
-            onDragStart={handleDragStart}
-            onDragMove={handleDragMove}
-            onDragEnd={dragEnd}
+            onDragStart={dgstart}
+            onDragEnd={dgend}
+            onDragOver={dgover}
           >
-            <SortableContext items={boards.map((i) => i.id)}>
+            <SimpleGrid columns={[1, 1, 2, 3, 4]} spacing={6}>
               {boards.map((b) => (
-                <Board key={b.id} id={b.id} title={b.title}>
-                  <SortableContext
-                    items={items
-                      .filter((x) => x.status === b.title)
-                      .map((i) => i.id)}
-                  >
+                <Board key={b.id} b={b} openCreateCard={openCreateCard}>
+                  <SortableContext items={items.map((i) => i.id)}>
                     <Flex direction="column" gridRowGap={4}>
-                      {items.map((x) =>
-                        x.status === b.title ? (
-                          <Item key={x.id} id={x.id} title={x.title} />
-                        ) : null,
+                      {items.map((c) =>
+                        c.stage === b.title ? <Card key={c.id} c={c} /> : null,
                       )}
                     </Flex>
                   </SortableContext>
                 </Board>
               ))}
-            </SortableContext>
+              <AddBoard />
+            </SimpleGrid>
             <DragOverlay>
-              {activeId && activeId?.id && activeId?.type === "board" && (
-                <Board id={activeId.id} title={findItems(activeId.id, "board")}>
-                  {items.map((x) =>
-                    x.status === findItems(activeId.id, "board") ? (
-                      <Item key={x.id} id={x.id} title={x.title} />
-                    ) : null,
-                  )}
-                </Board>
-              )}
-              {activeId && activeId?.id && activeId?.type === "item" && (
-                <Item id={activeId.id} title={findItems(activeId.id, "item")} />
-              )}
+              {activeId && <Card c={findItems(activeId)} />}
             </DragOverlay>
           </DndContext>
-        </SimpleGrid>
+        </Box>
       </Container>
+      <CreateCardModal
+        isOpen={isOpen}
+        onClose={() => {
+          onClose();
+          setStage(null);
+        }}
+        stage={stage}
+      />
     </Box>
   );
 };
-const Board = ({ id, title, children }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transition,
-    transform,
-    isDragging,
-  } = useSortable({
-    id: id,
+const Board = ({ b, children, openCreateCard }) => {
+  const { setNodeRef } = useDroppable({
+    id: b.id,
     data: {
       type: "board",
     },
   });
   return (
-    <Box
-      ref={setNodeRef}
-      {...attributes}
-      style={{
-        transition,
-        transform: CSS.Translate.toString(transform),
-        opacity: isDragging ? "30%" : "100%",
-      }}
-    >
+    <Box ref={setNodeRef}>
       <Flex
         w="full"
         bg={useColorModeValue("gray.200", "dark.200")}
+        boxShadow="md"
         borderRadius="xl"
         direction="column"
         gridRowGap={4}
         p="4"
       >
-        <Flex justifyContent="center" alignItems="center" {...listeners}>
+        <Flex justifyContent="center" alignItems="center">
           <Text
             fontWeight="bold"
             fontSize="md"
             userSelect="none"
             textTransform="capitalize"
           >
-            {title}
+            {b.title}
           </Text>
         </Flex>
         {children}
@@ -202,12 +151,14 @@ const Board = ({ id, title, children }) => {
           color="gray.500"
           alignItems="center"
           justifyContent="center"
+          cursor="pointer"
           gridColumnGap={2}
           py="1"
           borderRadius="md"
           _hover={{
             bg: useColorModeValue("gray.300", "dark.100"),
           }}
+          onClick={() => openCreateCard(b.title)}
         >
           <LuPlus size="18" />
           <Text fontWeight="bold">Add a card</Text>
@@ -216,31 +167,19 @@ const Board = ({ id, title, children }) => {
     </Box>
   );
 };
-
-const Item = ({ id, title }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transition,
-    transform,
-    isDragging,
-  } = useSortable({
-    id: id,
-    data: {
-      type: "item",
-    },
+const Card = ({ c }) => {
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
+    id: c.id,
+    data: { type: "card" },
   });
   return (
     <Box
       ref={setNodeRef}
       {...attributes}
+      {...listeners}
       style={{
-        transition,
-        transform: CSS.Translate.toString(transform),
         opacity: isDragging ? "30%" : "100%",
       }}
-      {...listeners}
     >
       <Box
         p="4"
@@ -254,16 +193,16 @@ const Item = ({ id, title }) => {
           borderColor: "blue.400",
         }}
       >
-        {id % 2 === 0 && (
+        {c.id % 2 === 0 && (
           <Box w="32px" h="4px" bg="red.400" borderRadius="full" mb="2" />
         )}
         <Text
           userSelect="none"
           color={useColorModeValue("gray.700", "gray.300")}
         >
-          {title}
+          {c.id} {c.title}
         </Text>
-        {id % 2 === 0 && (
+        {c.id % 2 === 0 && (
           <Flex
             justifyContent="space-between"
             alignItems="flex-end"
@@ -285,6 +224,28 @@ const Item = ({ id, title }) => {
           </Flex>
         )}
       </Box>
+    </Box>
+  );
+};
+const AddBoard = () => {
+  return (
+    <Box>
+      <Flex
+        alignItems="center"
+        gridColumnGap={2}
+        color="gray.500"
+        boxShadow="md"
+        bg={useColorModeValue("gray.200", "dark.200")}
+        borderRadius="xl"
+        cursor="pointer"
+        p="4"
+        _hover={{ bg: useColorModeValue("white", "dark.300") }}
+      >
+        <LuPlus size="18" />
+        <Text fontWeight="bold" fontSize="sm">
+          Add New Board
+        </Text>
+      </Flex>
     </Box>
   );
 };

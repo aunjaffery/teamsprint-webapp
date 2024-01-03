@@ -1,7 +1,14 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useBoundStore from "../../store/Store";
-import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Text,
+  useColorModeValue,
+} from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import Domain from "../../services/Endpoint";
@@ -30,9 +37,15 @@ const LoginPage = () => {
   }, [user]);
 
   return (
-    <Box bg="bg.100" w="100%" h="100vh">
+    <Box bg={useColorModeValue("bg.100", "dark.100")} w="100%" h="100vh">
       <Flex justifyContent="center" alignItems="center" w="100%" h="100%">
-        <Box bg="white" borderRadius="lg" boxShadow="md" minW="350px" py="6">
+        <Box
+          bg={useColorModeValue("white", "dark.300")}
+          borderRadius="lg"
+          boxShadow="md"
+          minW="350px"
+          py="6"
+        >
           <Box p="14">
             <Flex justifyContent="center" mb="6">
               <Text fontSize="3xl" fontWeight="bold">
@@ -52,15 +65,29 @@ const LoginPage = () => {
                   name="email"
                   placeholder="Email"
                   required
+                  borderTop={0}
+                  borderX={0}
+                  borderRadius={0}
+                  borderColor="gray.500"
+                  px="1"
+                  _focus={{ borderColor: "blue.400" }}
+                  _focusVisible={{ outline: 0 }}
                 />
               </Flex>
-              <Flex justifyContent="center" mb="8">
+              <Flex justifyContent="center" mb="12">
                 <Input
                   minW="280px"
                   type="password"
                   name="password"
                   placeholder="Password"
                   required
+                  borderTop={0}
+                  borderX={0}
+                  borderRadius={0}
+                  borderColor="gray.500"
+                  px="1"
+                  _focus={{ borderColor: "blue.400" }}
+                  _focusVisible={{ outline: 0 }}
                 />
               </Flex>
               <Flex justifyContent="center" mb="8">

@@ -1,29 +1,19 @@
 export const fk_boards = [
   { id: 101, title: "todo" },
-  { id: 102, title: "inprogress" },
+  { id: 102, title: "doing" },
   { id: 103, title: "done" },
 ];
 export const fk_items = [
-  { id: 2, status: "todo", title: "Hello world" },
-  { id: 1, status: "done", title: "Everything is Completed" },
-  { id: 3, status: "todo", title: "Building the famous Application" },
-  { id: 4, status: "inprogress", title: "Sleep" },
-  {
-    id: 6,
-    status: "done",
-    title:
-      "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-  },
+  { id: 1, stage: "done", p: "high", title: "Everything" },
+  { id: 2, stage: "todo", p: "high", title: "Hello" },
+  { id: 3, stage: "todo", p: "high", title: "Building" },
+  { id: 4, stage: "doing", title: "Sleep", p: "normal" },
+  { id: 6, stage: "done", p: "critical", title: "Lorem" },
   {
     id: 7,
-    status: "todo",
-    title:
-      "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
+    stage: "todo",
+    p: "normal",
+    title: "Application Lorem ipsum dolor sit amet",
   },
-  {
-    id: 8,
-    status: "inprogress",
-    title:
-      "Lorem ipsum dolor sit amet, qui minim labore adipisicing minim sint cillum sint consectetur cupidatat.",
-  },
+  { id: 8, stage: "doing", p: "critical", title: "Done" },
 ];

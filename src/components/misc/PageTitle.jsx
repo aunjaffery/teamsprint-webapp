@@ -7,7 +7,7 @@ const PageTitle = ({ title = "Dashboard" }) => {
         fontSize="2xl"
         fontWeight="bold"
         textTransform="capitalize"
-        color={useColorModeValue("gray.600", "gray.400")}
+        color={useColorModeValue("gray.700", "gray.300")}
       >
         {title}
       </Text>

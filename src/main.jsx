@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import Auth from "./components/Auth/Auth";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-
+const config = { initialColorMode: "dark" };
 const colors = {
   brand: {
     900: "#1a365d",
@@ -22,18 +22,17 @@ const colors = {
   footer: {
     100: "#e9cdb3",
   },
-	dark:{
-		100: "#22313a",
-		200: "#1e2a31",
-		300: "#2b3c46"
-	},
-	fuse: {
-		100: "#111827",
-		200: "#1e293b",
-		300: "#151d31",
-		400: "#181d2b"
-	}
-
+  dark: {
+    100: "#22313a",
+    200: "#1e2a31",
+    300: "#2b3c46",
+  },
+  fuse: {
+    100: "#111827",
+    200: "#1e293b",
+    300: "#151d31",
+    400: "#181d2b",
+  },
 };
 const Button = {
   variants: {
@@ -43,7 +42,7 @@ const Button = {
     },
   },
 };
-const theme = extendTheme({ colors, components: { Button } });
+const theme = extendTheme({ config, colors, components: { Button } });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>

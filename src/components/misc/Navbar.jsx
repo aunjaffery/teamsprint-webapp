@@ -2,8 +2,8 @@ import {
   Avatar,
   Box,
   Button,
+  Container,
   Flex,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -12,12 +12,12 @@ import {
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";
-import useBoundStore from "../../store/Store";
-import { MdMenu, MdNotifications } from "react-icons/md";
+import { MdNotifications } from "react-icons/md";
 import {
   LuClipboardCheck,
   LuLayoutTemplate,
   LuMoon,
+  LuRocket,
   LuSun,
   LuUsers,
 } from "react-icons/lu";
@@ -26,85 +26,104 @@ import MyNavLinks from "../../services/MyNavLinks";
 
 const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const { isSidebarOpen, onSidebarClose, onSidebarOpen } = useBoundStore(
-    (state) => state,
-  );
 
   return (
-    <Box w="100%">
-      <Flex
-        bg={useColorModeValue("bg.100", "dark.200")}
-        h="68px"
-        align="center"
-        justify="space-between"
-        boxShadow="md"
-      >
-        <Flex alignItems="center">
-          <Box ml="6">
-            <Menu>
-              <MenuButton as={Button} colorScheme="green" size="md">
-                Create
-              </MenuButton>
-              <MenuList>
-                {MyMenus.map((m) => (
-                  <MenuItem key={m.id}>
-                    <Flex direction="column" maxW="360px">
-                      <Flex>
-                        <Box mt="1" mr="1">
-                          {m.i}
-                        </Box>
-                        <Text>{m.t}</Text>
-                      </Flex>
-                      <Text
-                        fontSize="xs"
-                        color={useColorModeValue("gray.600", "gray.400")}
-                      >
-                        {m.d}
-                      </Text>
-                    </Flex>
-                  </MenuItem>
-                ))}
-              </MenuList>
-            </Menu>
-          </Box>
-        </Flex>
-        <Flex justifyContent="center" alignItems="center" gridColumnGap={8}>
-          {MyNavLinks.map((l) => (
-            <NavLink to={l.path} key={l.id}>
-              <Text
-                fontWeight="bold"
-                textTransform="capitalize"
-                color={useColorModeValue("gray.700", "gray.400")}
-                _hover={{
-                  color: useColorModeValue("black", "white"),
-                }}
-              >
-                {l.title}
-              </Text>
-            </NavLink>
-          ))}
-        </Flex>
-
-        <Flex justifyContent="center" alignItems="center" pr="2">
+    <Box w="100%" bg={useColorModeValue("bg.100", "dark.200")} boxShadow="md">
+      <Container maxW="1400px">
+        <Flex h="68px" align="center" justify="space-between">
           <Flex
-            justifyContent="center"
             alignItems="center"
-            pr="4"
-            onClick={toggleColorMode}
+            color={useColorModeValue("gray.700", "gray.300")}
+            cursor="pointer"
+            h="100%"
           >
-            {colorMode === "dark" ? <LuSun size="24" /> : <LuMoon size="24" />}
-          </Flex>
-          <Flex justifyContent="center" alignItems="center" pr="4">
-            <MdNotifications size="24" />
-          </Flex>
-          <Flex justifyContent="center" alignItems="center" pr="2">
-            <Avatar name="Dan Abrahmov" src="https://bit.ly/prosper-baba" />
-            <Text pl="2" fontSize="sm" fontWeight="bold">
-              AunJaffery
+            <Text fontWeight="bold" fontSize="xl">
+              Team
+            </Text>
+            <Box>
+              <LuRocket size="20" />
+            </Box>
+            <Text fontWeight="bold" fontSize="xl">
+              Sprint
             </Text>
           </Flex>
+          <Flex justifyContent="center" alignItems="center" gridColumnGap={8}>
+            {MyNavLinks.map((l) => (
+              <NavLink to={l.path} key={l.id}>
+                <Text
+                  fontWeight="bold"
+                  textTransform="capitalize"
+                  color={useColorModeValue("gray.700", "gray.400")}
+                  _hover={{
+                    color: useColorModeValue("black", "white"),
+                  }}
+                >
+                  {l.title}
+                </Text>
+              </NavLink>
+            ))}
+            <Box>
+              <Menu>
+                <MenuButton as={Button} colorScheme="teal" size="sm">
+                  Create
+                </MenuButton>
+                <MenuList>
+                  {MyMenus.map((m) => (
+                    <MenuItem key={m.id}>
+                      <Flex direction="column" maxW="360px">
+                        <Flex>
+                          <Box mt="1" mr="1">
+                            {m.i}
+                          </Box>
+                          <Text>{m.t}</Text>
+                        </Flex>
+                        <Text
+                          fontSize="xs"
+                          color={useColorModeValue("gray.600", "gray.400")}
+                        >
+                          {m.d}
+                        </Text>
+                      </Flex>
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </Box>
+          </Flex>
+
+          <Flex justifyContent="center" alignItems="center" pr="2">
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              mr="4"
+              onClick={toggleColorMode}
+              cursor="pointer"
+              py="2"
+            >
+              {colorMode === "dark" ? (
+                <LuSun size="20" />
+              ) : (
+                <LuMoon size="20" />
+              )}
+            </Flex>
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              mr="4"
+              py="2"
+              cursor="pointer"
+            >
+              <MdNotifications size="20" />
+            </Flex>
+            <Flex justifyContent="center" alignItems="center" pr="2">
+              <Avatar name="Dan Abrahmov" src="https://bit.ly/prosper-baba" />
+              <Text pl="2" fontSize="sm" fontWeight="bold">
+                AunJaffery
+              </Text>
+            </Flex>
+          </Flex>
         </Flex>
-      </Flex>
+      </Container>
     </Box>
   );
 };
