@@ -1,14 +1,9 @@
-import { useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import { Box, Flex, useColorModeValue } from "@chakra-ui/react";
 
-const Layout = ({ children }) => {
-  const location = useLocation();
-
+const Layout = ({ children, pathname }) => {
   const render = () => {
-    return location.pathname === "/login" || location.pathname === "/signup"
-      ? true
-      : false;
+    return pathname === "/login" || pathname === "/signup" ? true : false;
   };
 
   if (render()) {

@@ -14,22 +14,15 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import React from "react";
 import { toast } from "react-toastify";
-import Domain from "../../services/Endpoint";
+import { createBoard, findWorkspace } from "../../services/Queries";
 
-const CreateKbnModal = ({ isOpen, onClose, ws }) => {
+const CreateKbnModal = ({ isOpen, onClose }) => {
+  const { isLoading, isError, data } = findWorkspace();
   const queryClient = useQueryClient();
-  const createBoard = useMutation({
-    mutationFn: async (e) => {
-      e.preventDefault();
-      const rsp = await axios.post(
-        `${Domain}/kbn/createKbn`,
-        new FormData(e.target),
-      );
-      return rsp.data;
-    },
+  const createBoardMutation = useMutation({
+    mutationFn: createBoard,
     onSuccess: (data) => {
       console.log(data);
       queryClient.invalidateQueries({ queryKey: ["workspacekbns"] });
@@ -41,6 +34,9 @@ const CreateKbnModal = ({ isOpen, onClose, ws }) => {
     },
   });
   const initialRef = React.useRef(null);
+  if (isError) {
+    toast.error("Error! Cannot fetch workspace");
+  }
 
   return (
     <Box>
@@ -49,13 +45,13 @@ const CreateKbnModal = ({ isOpen, onClose, ws }) => {
         <ModalContent>
           <ModalHeader>Create Board</ModalHeader>
           <ModalCloseButton />
-          <form onSubmit={createBoard.mutate}>
+          <form onSubmit={createBoardMutation.mutate}>
             <ModalBody pb={6}>
               <FormControl>
                 <FormLabel>Workspace</FormLabel>
                 <Select name="workspace" required>
-                  {ws &&
-                    ws.map((w) => (
+                  {data?.ws &&
+                    data.ws.map((w) => (
                       <option key={w.id} value={w.id}>
                         {w.name}
                       </option>
@@ -88,7 +84,7 @@ const CreateKbnModal = ({ isOpen, onClose, ws }) => {
                 colorScheme="blue"
                 mr={3}
                 type="submit"
-                isLoading={createBoard.isPending}
+                isLoading={createBoardMutation.isPending || isLoading}
               >
                 Create
               </Button>

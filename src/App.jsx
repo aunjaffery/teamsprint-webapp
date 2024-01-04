@@ -1,4 +1,4 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./pages/dashboard/Dashboard.page";
 import LoginPage from "./pages/AuthPages/Login.page";
 import NotFound from "./pages/notfound/NotFound.page";
@@ -12,23 +12,25 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Test from "./pages/test/Test";
 import KanbanPage from "./pages/kanban/Kanban.page";
+import { useEffect } from "react";
 
 function App() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const authCheck = useBoundStore((state) => {
     return state.user ? state.user : false;
   });
-  // useEffect(() => {
-  //   // useEffect only if you want whole App private.
-  //   if (authCheck === false) navigate("login");
-  //   //remove this useEffect if You want some public pages in App.
-  //   //Route can handle private pages individually through ProtectedRoute
-  // }, [authCheck]);
+  useEffect(() => {
+    // useEffect only if you want whole App private.
+    if (authCheck === false) navigate("login");
+    //remove this useEffect if You want some public pages in App.
+    //Route can handle private pages individually through ProtectedRoute
+  }, [authCheck]);
 
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <Layout>
+      <Layout pathname={pathname}>
         <Routes>
           <Route path="login" element={<LoginPage />} />
           <Route

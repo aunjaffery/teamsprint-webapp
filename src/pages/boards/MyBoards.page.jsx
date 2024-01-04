@@ -1,25 +1,22 @@
 import { Box, Container } from "@chakra-ui/react";
 import PageTitle from "../../components/misc/PageTitle";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import Domain from "../../services/Endpoint";
 import ErrorComponent from "../../components/misc/ErrorComponent";
 import CustomLoader from "../../components/misc/CustomLoader";
 import WsKbnList from "../../components/kanban/WsKbnList";
+import { workspacekbns } from "../../services/Queries";
+import useBoundStore from "../../store/Store";
+import CreateKbnModal from "../../components/modals/CreateKbn";
 
 const MyBoards = () => {
-  const { isError, data, isLoading } = useQuery({
-    queryKey: ["workspacekbns"],
-    queryFn: () =>
-      axios.get(`${Domain}/ws/workspacekbns`).then((res) => res.data),
-  });
+  const { isLoading, data, isError } = workspacekbns();
+  const ws = data?.ws;
   if (isError) {
     return <ErrorComponent error="Error! Please try again." />;
   }
-  const ws = data?.ws;
+
   return (
     <Box>
-      <Container maxW="container.xl">
+      <Container maxW="1400px">
         <PageTitle title="Your Workspaces" />
         <Box>{isLoading ? <CustomLoader /> : <WsKbnList ws={ws} />}</Box>
       </Container>

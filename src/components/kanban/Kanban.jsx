@@ -6,15 +6,17 @@ import PageTitle from "../../components/misc/PageTitle";
 import Card from "../../components/kanban/Card";
 import List from "../../components/kanban/List";
 import AddList from "../../components/kanban/AddList";
-import { fk_items, fk_lists } from "./faker";
+import { fk_lists } from "./faker";
 
 const Kanban = ({ data }) => {
-  const [lists, _] = useState(fk_lists);
-  const [items, setItems] = useState(data);
+  const [lists, setLists] = useState(data.lists);
+  const [cards, setCards] = useState(data.cards);
   const [activeId, setActiveId] = useState(null);
   useEffect(() => {
-    if (!data) return;
-    setItems(data);
+    if (!data.cards) return;
+    setCards(data.cards);
+    if (!data.lists) return;
+    setLists(lists);
   }, [data]);
 
   const dgstart = (e) => {
@@ -32,27 +34,27 @@ const Kanban = ({ data }) => {
     if (actId === ovrId) return;
     console.log(`act ${actId}-${actType} | ovr ${ovrId}-${ovrType}`);
     if (actType === "card" && ovrType === "list") {
-      let newItems = [...items];
+      let newItems = [...cards];
       let actItem = newItems.find((x) => x.id === actId);
       let ovrItem = lists.find((x) => x.id === ovrId);
       if (actItem.status === ovrItem.title) return;
       actItem.status = ovrItem.title;
-      setItems(newItems);
+      setCards(newItems);
     }
     if (actType === "card" && ovrType === "card") {
-      let newItems = [...items];
+      let newItems = [...cards];
       let actItem = newItems.find((x) => x.id === actId);
       let ovrItem = newItems.find((x) => x.id === ovrId);
       if (actItem.status === ovrItem.status) {
-        let activeItemIndex = items.findIndex((f) => f.id === active.id);
-        let overItemIndex = items.findIndex((f) => f.id === over.id);
+        let activeItemIndex = cards.findIndex((f) => f.id === active.id);
+        let overItemIndex = cards.findIndex((f) => f.id === over.id);
         if (activeItemIndex < 0 || overItemIndex < 0) return;
-        let newItems = [...items];
+        let newItems = [...cards];
         newItems = arrayMove(newItems, activeItemIndex, overItemIndex);
-        setItems(newItems);
+        setCards(newItems);
       } else {
         actItem.status = ovrItem.status;
-        setItems(newItems);
+        setCards(newItems);
       }
     }
   };
@@ -62,7 +64,7 @@ const Kanban = ({ data }) => {
   };
   const findItems = (id) => {
     if (!id) return;
-    let i = items.find((x) => x.id === id);
+    let i = cards.find((x) => x.id === id);
     return i;
   };
 
@@ -77,17 +79,23 @@ const Kanban = ({ data }) => {
             onDragOver={dgover}
           >
             <SimpleGrid columns={[1, 1, 2, 3, 4]} spacing={6}>
-              {lists.map((b) => (
-                <List key={b.id} b={b}>
-                  <SortableContext items={items.map((i) => i.id)}>
-                    <Flex direction="column" gridRowGap={4}>
-                      {items.map((c) =>
-                        c.status === b.title ? <Card key={c.id} c={c} /> : null,
-                      )}
-                    </Flex>
-                  </SortableContext>
-                </List>
-              ))}
+              {lists &&
+                lists.length &&
+                lists.map((b) => (
+                  <List key={b.id} b={b}>
+                    {cards && cards.length ? (
+                      <SortableContext items={cards.map((i) => i.id)}>
+                        <Flex direction="column" gridRowGap={4}>
+                          {cards.map((c) =>
+                            c.status === b.title ? (
+                              <Card key={c.id} c={c} />
+                            ) : null,
+                          )}
+                        </Flex>
+                      </SortableContext>
+                    ) : null}
+                  </List>
+                ))}
               <AddList />
             </SimpleGrid>
             <DragOverlay>

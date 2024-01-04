@@ -12,23 +12,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LuPlus, LuX } from "react-icons/lu";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Domain from "../../services/Endpoint";
-import axios from "axios";
+import { createCard } from "../../services/Queries";
 
 const List = ({ b, children }) => {
   const queryClient = useQueryClient();
-  const createCard = useMutation({
-    mutationFn: async (data) => {
-      const rsp = await axios.post(`${Domain}/crd/createcard`, data);
-      return rsp.data;
-    },
+  const createCardMutation = useMutation({
+    mutationFn: createCard,
     onSuccess: (data) => {
-      console.log(data);
-      queryClient.invalidateQueries({ queryKey: ["fetchcards"] });
+      queryClient.invalidateQueries({ queryKey: ["fetchKbnCards"] });
       onClose();
     },
-    onError: (error) => {
-      console.log(error);
+    onError: () => {
       toast.error("Error! Cannot create board");
     },
   });
@@ -49,7 +43,7 @@ const List = ({ b, children }) => {
       status: b.title,
       title,
     };
-    createCard.mutate(data);
+    createCardMutation.mutate(data);
   };
   return (
     <Box ref={setNodeRef}>
@@ -79,11 +73,17 @@ const List = ({ b, children }) => {
               <Textarea
                 borderColor="gray.400"
                 name="title"
+                max={100}
                 placeholder="Enter a title for this card"
                 required
               />
               <Flex mt="4" alignItems="center" gridColumnGap={2}>
-                <Button size="sm" colorScheme="teal" type="submit">
+                <Button
+                  size="sm"
+                  colorScheme="teal"
+                  type="submit"
+                  isLoading={createCardMutation.isPending}
+                >
                   Add card
                 </Button>
                 <Box

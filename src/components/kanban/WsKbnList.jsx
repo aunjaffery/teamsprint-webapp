@@ -1,16 +1,9 @@
-import { Box, Button, Flex, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Button, Flex, Text } from "@chakra-ui/react";
 import { LuSettings2, LuUsers } from "react-icons/lu";
-import CreateKbnModal from "../modals/CreateKbn";
 import { useNavigate } from "react-router-dom";
 
 const WsKbnList = ({ ws }) => {
   const navigate = useNavigate();
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  let workspace = ws.map((w) => ({
-    id: w.id,
-    name: w.name,
-  }));
-  console.log("workspaccc ->", workspace);
   return (
     <Flex direction="column" gridRowGap="12" mt="10">
       {ws &&
@@ -76,11 +69,6 @@ const WsKbnList = ({ ws }) => {
             </Box>
           </Box>
         ))}
-      {workspace && workspace.length ? (
-        <CreateKbnModal isOpen={isOpen} onClose={onClose} ws={workspace} />
-      ) : (
-        <Box />
-      )}
     </Flex>
   );
 };

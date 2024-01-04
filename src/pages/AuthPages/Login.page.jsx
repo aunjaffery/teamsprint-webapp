@@ -10,23 +10,15 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import Domain from "../../services/Endpoint";
 import { toast } from "react-toastify";
 import LogoIcon from "../../assets/LogoIcon";
+import { LoginQuery } from "../../services/Queries";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { loginService, user } = useBoundStore((state) => state);
   const login = useMutation({
-    mutationFn: async (e) => {
-      e.preventDefault();
-      const rsp = await axios.post(
-        `${Domain}/user/login`,
-        new FormData(e.target),
-      );
-      return rsp.data;
-    },
+    mutationFn: LoginQuery,
     onSuccess: (data) => loginService(data.user, data.token),
     onError: () => toast.error("Error! Invalid credentials"),
   });

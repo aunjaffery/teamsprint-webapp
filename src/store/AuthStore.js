@@ -12,7 +12,6 @@ const createAuthStore = (set) => ({
     set({ user: null, authLoading: false, tokenLoading: false });
   },
   loginService: (user, token) => {
-    console.log(user);
     if (user && token) {
       setSession(token);
       set({ user: user });
@@ -22,7 +21,7 @@ const createAuthStore = (set) => ({
   },
   loginWithToken: async () => {
     try {
-      const rsp = await axios(`${Domain}/user/validation`);
+      const rsp = await axios(`${Domain}/api/user/validation`);
       if (rsp.data?.user && rsp.data?.token) {
         setSession(rsp.data?.token);
         set({ user: rsp.data?.user, tokenLoading: false });
